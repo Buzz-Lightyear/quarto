@@ -9,7 +9,7 @@
     <h1>Quarto</h1>
     
     <div class="instructions">
-      <p>Place the highlighted piece on the board. After your move, the computer will place its piece and choose your next piece.</p>
+      <p>Instructions: TBD</p>
     </div>
     
     <div class="game-container">
