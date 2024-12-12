@@ -147,8 +147,8 @@ export const gameStore = createGameStore();
 
 export const gameStatus = derived(gameStore, $game => {
   if ($game.winner) {
-    const winner = $game.winner === "Player" ? "You" : "Computer";
-    return `${winner} wins!`;
+    const message = $game.winner === "Player" ? "You win!" : "You lost :(";
+    return `${message}`;
   }
   if ($game.gameOver) {
     return "It's a draw!";
