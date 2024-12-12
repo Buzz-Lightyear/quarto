@@ -78,7 +78,11 @@
     }
   
     .mandatory-piece {
-      text-align: center;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;    /* Center the mandatory piece */
+        margin-bottom: 20px;
     }
   
     .highlighted-piece {
@@ -112,8 +116,15 @@
     .grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      padding: 0 8px;
+      gap: 16px;
+      padding: 0 12px;
+    }
+
+    .grid > div {
+        display: flex;
+        align-items: center;     /* Vertical centering */
+        justify-content: center; /* Horizontal centering */
+        min-height: 140px;      /* Ensure consistent height for all cells */
     }
   
     .selectable {

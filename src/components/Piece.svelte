@@ -27,7 +27,7 @@
 >
   {#if piece}
     <svg
-      viewBox="0 0 100 100"
+      viewBox="-10 0 120 120"
       preserveAspectRatio="xMidYMid meet"
       class="piece-svg"
     >
