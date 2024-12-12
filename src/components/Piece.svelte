@@ -7,142 +7,117 @@
 
   $: sizeNum = parseInt(size);
   $: height = piece?.height === 'tall' ? sizeNum * 0.8 : sizeNum * 0.4;
-  $: fillColor = piece ? (piece.color === 'red' ? '#ff6b6b' : '#4dabf7') : 'transparent';
   
-  // Define stroke colors based on piece color
-  $: strokeColor = piece?.color === 'red' ? '#d63939' : '#228be6';
+  // Declare variables before using them in reactive statements
+  let fillColor, strokeColor;
   
-  // For hollow pieces, we'll use different gradients
+  // Lighter fills, darker strokes for better visibility
+  $: {
+    if (piece?.color === 'red') {
+      fillColor = '#ffa8a8';  // Light red fill
+      strokeColor = '#f03e3e'; // Darker red stroke
+    } else if (piece?.color === 'blue') {
+      fillColor = '#74c0fc';  // Light blue fill
+      strokeColor = '#1c7ed6'; // Darker blue stroke
+    } else {
+      fillColor = 'transparent';
+      strokeColor = 'transparent';
+    }
+  }
+  
   $: isHollow = piece?.top === 'hollow';
+
+  function handleKeyPress(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.currentTarget.click();
+    }
+  }
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="piece-container"
   class:selectable
   class:selected
   style="width: {size}; height: {size};"
   on:click
+  on:keydown={handleKeyPress}
+  role={selectable ? 'button' : 'presentation'}
+  tabindex={selectable ? 0 : -1}
 >
   {#if piece}
     <svg
-      viewBox="-10 0 120 120"
+      viewBox="0 0 100 120"
       preserveAspectRatio="xMidYMid meet"
       class="piece-svg"
     >
-      <defs>
-        <!-- Gradient for solid pieces -->
-        <linearGradient id="solidGradient-{piece.color}" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" style="stop-color:{strokeColor};stop-opacity:1"/>
-          <stop offset="50%" style="stop-color:{fillColor};stop-opacity:1"/>
-          <stop offset="100%" style="stop-color:{strokeColor};stop-opacity:1"/>
-        </linearGradient>
-        <!-- Gradient for hollow pieces -->
-        <linearGradient id="hollowGradient-{piece.color}" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" style="stop-color:{strokeColor};stop-opacity:0.3"/>
-          <stop offset="50%" style="stop-color:{fillColor};stop-opacity:0.3"/>
-          <stop offset="100%" style="stop-color:{strokeColor};stop-opacity:0.3"/>
-        </linearGradient>
-      </defs>
-
       {#if piece.shape === 'circular'}
         <!-- Shadow -->
         <ellipse
           cx="50"
-          cy="82"
+          cy="90"
           rx="25"
           ry="10"
           fill="#000000"
           opacity="0.1"
         />
         
-        {#if isHollow}
-          <!-- Inner cylinder for hollow pieces -->
-          <path
-            d="M30,80 
-               C30,80 30,{80-height+5} 30,{80-height+5}
-               C30,{80-height+2} 38,{80-height-3} 50,{80-height-3}
-               C62,{80-height-3} 70,{80-height+2} 70,{80-height+5}
-               C70,{80-height+5} 70,80 70,80
-               C70,83 62,88 50,88
-               C38,88 30,83 30,80 Z"
-            fill="url(#hollowGradient-{piece.color})"
-            stroke={strokeColor}
-            stroke-width="1"
-          />
-          <ellipse
-            cx="50"
-            cy={80-height+5}
-            rx="20"
-            ry="7"
-            fill="url(#hollowGradient-{piece.color})"
-            stroke={strokeColor}
-            stroke-width="1"
-          />
-        {/if}
-        
-        <!-- Main cylinder outline -->
+        <!-- Main cylinder body -->
         <path
-          d="M25,80 
-             C25,80 25,{80-height} 25,{80-height}
-             C25,{80-height-3} 35,{80-height-8} 50,{80-height-8}
-             C65,{80-height-8} 75,{80-height-3} 75,{80-height}
-             C75,{80-height} 75,80 75,80
-             C75,83 65,88 50,88
-             C35,88 25,83 25,80 Z"
-          fill="none"
+          d="M25,85 
+             C25,85 25,{85-height} 25,{85-height}
+             C25,{85-height-3} 35,{85-height-8} 50,{85-height-8}
+             C65,{85-height-8} 75,{85-height-3} 75,{85-height}
+             C75,{85-height} 75,85 75,85
+             C75,88 65,93 50,93
+             C35,93 25,88 25,85 Z"
+          fill={isHollow ? 'none' : fillColor}
           stroke={strokeColor}
           stroke-width="2"
         />
         
-        <!-- Top rim -->
+        <!-- Top circle -->
         <ellipse
           cx="50"
-          cy={80-height}
+          cy={85-height}
           rx="25"
           ry="8"
-          fill="none"
+          fill={isHollow ? 'none' : fillColor}
           stroke={strokeColor}
           stroke-width="2"
         />
         
       {:else}
-        <!-- Square piece with similar hollow/solid treatment -->
-        {#if isHollow}
-          <!-- Inner square for hollow pieces -->
-          <path
-            d={`M35,75 l0,-${height-10} l30,0 l0,${height-10} Z`}
-            fill={fillColor}
-            opacity="0.3"
-            stroke={strokeColor}
-            stroke-width="1"
-          />
-          <path
-            d={`M35,${75 - height + 10} l15,-7 l30,0 l-15,7 Z`}
-            fill={fillColor}
-            opacity="0.3"
-            stroke={strokeColor}
-            stroke-width="1"
-          />
-        {/if}
-        
-        <!-- Outer square (unchanged structure, updated colors) -->
+        <!-- Square piece -->
+        <!-- Front face -->
         <path
-          d={`M30,80 l0,-${height} l40,0 l0,${height} Z`}
-          fill="none"
+          d="M35,85 
+             l0,-{height} 
+             l30,0 
+             l0,{height} 
+             Z"
+          fill={isHollow ? 'none' : fillColor}
           stroke={strokeColor}
           stroke-width="2"
         />
+        <!-- Top face -->
         <path
-          d={`M30,${80 - height} l20,-10 l40,0 l-20,10 Z`}
-          fill="none"
+          d="M35,{85-height} 
+             l15,-8 
+             l30,0 
+             l-15,8 
+             Z"
+          fill={isHollow ? 'none' : fillColor}
           stroke={strokeColor}
           stroke-width="2"
         />
+        <!-- Right side -->
         <path
-          d={`M70,80 l20,-10 l0,-${height} l-20,10 Z`}
-          fill="none"
+          d="M65,85 
+             l15,-8 
+             l0,-{height} 
+             l-15,8 
+             Z"
+          fill={isHollow ? 'none' : fillColor}
           stroke={strokeColor}
           stroke-width="2"
         />
@@ -153,12 +128,9 @@
 
 <style>
   .piece-container {
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    padding: 4px;
-    box-sizing: border-box;
-    cursor: default;
-    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .piece-svg {
@@ -176,6 +148,5 @@
 
   .selected {
     background-color: #e0e0e0;
-    border-color: #666;
   }
 </style>
