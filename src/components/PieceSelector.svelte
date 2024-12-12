@@ -39,7 +39,7 @@
             >
               <Piece 
                 piece={piece} 
-                size="65px"
+                size="85px"
                 selectable={$gameStore.waitingForPieceSelection}
                 on:click={() => selectPieceForOpponent(piece)}
               />
