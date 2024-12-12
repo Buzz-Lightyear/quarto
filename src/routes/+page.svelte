@@ -8,6 +8,10 @@
   <main>
     <h1>Quarto</h1>
     
+    <div class="instructions">
+      <p>Place the highlighted piece on the board. After your move, the computer will place its piece and choose your next piece.</p>
+    </div>
+    
     <div class="game-container">
       <Board />
       <PieceSelector />
@@ -30,7 +34,20 @@
   
     h1 {
       color: #212529;
-      margin-bottom: 32px;
+      margin-bottom: 16px;
+    }
+  
+    .instructions {
+      max-width: 600px;
+      margin: 0 auto 32px;
+      padding: 12px;
+      background-color: #e7f5ff;
+      border-radius: 8px;
+    }
+  
+    .instructions p {
+      margin: 0;
+      color: #1864ab;
     }
   
     .game-container {

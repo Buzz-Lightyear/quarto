@@ -3,18 +3,21 @@ import { writable, derived } from 'svelte/store';
 import { generatePieces, checkWin } from './gameLogic';
 
 function createGameStore() {
+  // Generate initial pieces
+  const pieces = generatePieces();
+  
   const initialState = {
     board: Array(16).fill(null),
-    pieces: generatePieces(),
-    selectedPiece: null,  // The piece that must be played
-    isPlayerTurn: true,   // True when player needs to place piece
+    pieces: pieces.slice(1), // All pieces except the first one
+    selectedPiece: pieces[0], // Start with the first piece selected
+    isPlayerTurn: true,
     winner: null,
     gameOver: false
   };
 
   const { subscribe, set, update } = writable(initialState);
 
-  // Simple computer move - just picks the first available spot
+  // Rest of the store logic remains the same
   function makeComputerMove(state) {
     const availableSpots = state.board
       .map((piece, index) => piece === null ? index : -1)
@@ -25,11 +28,9 @@ function createGameStore() {
     const randomIndex = Math.floor(Math.random() * availableSpots.length);
     const position = availableSpots[randomIndex];
     
-    // Place the piece
     const newBoard = [...state.board];
     newBoard[position] = state.selectedPiece;
     
-    // Select a random piece for the player
     const remainingPieces = state.pieces.filter(p => p.id !== state.selectedPiece.id);
     const nextPiece = remainingPieces[Math.floor(Math.random() * remainingPieces.length)];
     
@@ -51,13 +52,11 @@ function createGameStore() {
         return state;
       }
       
-      // Place player's piece
       const newBoard = [...state.board];
       newBoard[index] = state.selectedPiece;
       
       const remainingPieces = state.pieces.filter(p => p.id !== state.selectedPiece.id);
       
-      // Check if player won
       if (checkWin(newBoard)) {
         return {
           ...state,
@@ -68,7 +67,6 @@ function createGameStore() {
         };
       }
       
-      // If game isn't over, prepare computer's turn
       if (remainingPieces.length === 0) {
         return {
           ...state,
@@ -78,7 +76,6 @@ function createGameStore() {
         };
       }
       
-      // Computer's turn
       return makeComputerMove({
         ...state,
         board: newBoard,
@@ -86,7 +83,17 @@ function createGameStore() {
         isPlayerTurn: false
       });
     }),
-    reset: () => set(initialState)
+    reset: () => {
+      const pieces = generatePieces();
+      set({
+        board: Array(16).fill(null),
+        pieces: pieces.slice(1),
+        selectedPiece: pieces[0],
+        isPlayerTurn: true,
+        winner: null,
+        gameOver: false
+      });
+    }
   };
 }
 
