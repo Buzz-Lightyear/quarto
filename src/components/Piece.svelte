@@ -8,20 +8,12 @@
   $: sizeNum = parseInt(size);
   $: height = piece?.height === 'tall' ? sizeNum * 0.8 : sizeNum * 0.4;
   $: fillColor = piece ? (piece.color === 'red' ? '#ff6b6b' : '#4dabf7') : 'transparent';
-  $: opacity = piece?.top === 'hollow' ? '0.4' : '0.9';
   
-  // Calculate cylinder side curve points
-  function getCylinderPath(baseY, pieceHeight) {
-    const centerX = 50;
-    const radiusX = 20;
-    const radiusY = 8;
-    
-    // Create smooth curve for cylinder sides
-    const curve1 = `C${centerX-radiusX},${baseY-radiusY} ${centerX-radiusX},${baseY-pieceHeight+radiusY} ${centerX},${baseY-pieceHeight}`;
-    const curve2 = `C${centerX+radiusX},${baseY-pieceHeight+radiusY} ${centerX+radiusX},${baseY-radiusY} ${centerX},${baseY}`;
-    
-    return `M${centerX},${baseY} ${curve1} ${curve2}`;
-  }
+  // Define stroke colors based on piece color
+  $: strokeColor = piece?.color === 'red' ? '#d63939' : '#228be6';
+  
+  // For hollow pieces, we'll use different gradients
+  $: isHollow = piece?.top === 'hollow';
 </script>
 
 <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -39,81 +31,120 @@
       preserveAspectRatio="xMidYMid meet"
       class="piece-svg"
     >
-      <!-- If piece is circular -->
+      <defs>
+        <!-- Gradient for solid pieces -->
+        <linearGradient id="solidGradient-{piece.color}" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:{strokeColor};stop-opacity:1"/>
+          <stop offset="50%" style="stop-color:{fillColor};stop-opacity:1"/>
+          <stop offset="100%" style="stop-color:{strokeColor};stop-opacity:1"/>
+        </linearGradient>
+        <!-- Gradient for hollow pieces -->
+        <linearGradient id="hollowGradient-{piece.color}" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:{strokeColor};stop-opacity:0.3"/>
+          <stop offset="50%" style="stop-color:{fillColor};stop-opacity:0.3"/>
+          <stop offset="100%" style="stop-color:{strokeColor};stop-opacity:0.3"/>
+        </linearGradient>
+      </defs>
+
       {#if piece.shape === 'circular'}
-        <!-- Bottom ellipse shadow -->
+        <!-- Shadow -->
         <ellipse
           cx="50"
-          cy="80"
-          rx="20"
-          ry="8"
-          fill="#ddd"
-          opacity="0.3"
+          cy="82"
+          rx="25"
+          ry="10"
+          fill="#000000"
+          opacity="0.1"
         />
-        <!-- Main cylinder body -->
+        
+        {#if isHollow}
+          <!-- Inner cylinder for hollow pieces -->
+          <path
+            d="M30,80 
+               C30,80 30,{80-height+5} 30,{80-height+5}
+               C30,{80-height+2} 38,{80-height-3} 50,{80-height-3}
+               C62,{80-height-3} 70,{80-height+2} 70,{80-height+5}
+               C70,{80-height+5} 70,80 70,80
+               C70,83 62,88 50,88
+               C38,88 30,83 30,80 Z"
+            fill="url(#hollowGradient-{piece.color})"
+            stroke={strokeColor}
+            stroke-width="1"
+          />
+          <ellipse
+            cx="50"
+            cy={80-height+5}
+            rx="20"
+            ry="7"
+            fill="url(#hollowGradient-{piece.color})"
+            stroke={strokeColor}
+            stroke-width="1"
+          />
+        {/if}
+        
+        <!-- Main cylinder outline -->
         <path
-          d={getCylinderPath(80, height)}
-          fill={fillColor}
-          opacity={opacity}
-          class="main-body"
+          d="M25,80 
+             C25,80 25,{80-height} 25,{80-height}
+             C25,{80-height-3} 35,{80-height-8} 50,{80-height-8}
+             C65,{80-height-8} 75,{80-height-3} 75,{80-height}
+             C75,{80-height} 75,80 75,80
+             C75,83 65,88 50,88
+             C35,88 25,83 25,80 Z"
+          fill="none"
+          stroke={strokeColor}
+          stroke-width="2"
         />
-        <!-- Top ellipse -->
+        
+        <!-- Top rim -->
         <ellipse
           cx="50"
-          cy={80 - height}
-          rx="20"
-          ry="8"
-          fill={fillColor}
-          opacity={opacity}
-          class="top"
-        />
-        <!-- Outer strokes -->
-        <path
-          d={getCylinderPath(80, height)}
-          fill="none"
-          stroke="#333"
-          stroke-width="1"
-        />
-        <ellipse
-          cx="50"
-          cy={80 - height}
-          rx="20"
+          cy={80-height}
+          rx="25"
           ry="8"
           fill="none"
-          stroke="#333"
-          stroke-width="1"
+          stroke={strokeColor}
+          stroke-width="2"
         />
+        
       {:else}
-        <!-- Square piece (unchanged) -->
+        <!-- Square piece with similar hollow/solid treatment -->
+        {#if isHollow}
+          <!-- Inner square for hollow pieces -->
+          <path
+            d={`M35,75 l0,-${height-10} l30,0 l0,${height-10} Z`}
+            fill={fillColor}
+            opacity="0.3"
+            stroke={strokeColor}
+            stroke-width="1"
+          />
+          <path
+            d={`M35,${75 - height + 10} l15,-7 l30,0 l-15,7 Z`}
+            fill={fillColor}
+            opacity="0.3"
+            stroke={strokeColor}
+            stroke-width="1"
+          />
+        {/if}
+        
+        <!-- Outer square (unchanged structure, updated colors) -->
         <path
           d={`M30,80 l0,-${height} l40,0 l0,${height} Z`}
-          fill={fillColor}
-          opacity={opacity}
-          class="front"
+          fill="none"
+          stroke={strokeColor}
+          stroke-width="2"
         />
         <path
           d={`M30,${80 - height} l20,-10 l40,0 l-20,10 Z`}
-          fill={fillColor}
-          opacity={opacity}
-          class="top"
+          fill="none"
+          stroke={strokeColor}
+          stroke-width="2"
         />
         <path
           d={`M70,80 l20,-10 l0,-${height} l-20,10 Z`}
-          fill={fillColor}
-          opacity={opacity * 0.8}
-          class="side"
-        />
-        <path
-          d={`M30,80 l0,-${height} l40,0 l20,-10 l0,${height} l-20,10 Z`}
           fill="none"
-          stroke="#333"
-          stroke-width="1"
-        />
-        <path
-          d={`M30,${80 - height} l20,-10 l40,0`}
-          fill="none"
-          stroke="#333"
-          stroke-width="1"
+          stroke={strokeColor}
+          stroke-width="2"
         />
       {/if}
     </svg>
