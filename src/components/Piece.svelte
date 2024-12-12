@@ -6,6 +6,8 @@
   export let selected = false;
 </script>
 
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="piece"
   class:selectable
@@ -14,6 +16,7 @@
   on:click
 >
   {#if piece}
+    <!-- svelte-ignore element_invalid_self_closing_tag -->
     <div
       class="piece-inner"
       class:tall={piece.height === 'tall'}
