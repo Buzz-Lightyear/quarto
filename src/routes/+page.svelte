@@ -9,7 +9,10 @@
     <h1>Quarto</h1>
     
     <div class="instructions">
-      <p>Instructions: TBD</p>
+      <p><b>Instructions</b>: Every piece has 4 properties with 2 possible values for each property: color (red/blue), shape (cuboid/cylinder), density (hollow/full) and height (tall/short).
+        <br/><br/>Your turn begins with a piece you must place on the grid that's pre-selected for you by the computer. Once you place your piece, you'll in turn choose a piece for the computer to place.
+        <br/><br/>This process continues until the game ends in a win or a draw. A player wins the game by placing a piece such that 4 consecutive pieces (horizontally, vertically or diagonally) share the same property.
+      </p>
     </div>
     
     <div class="game-container">
