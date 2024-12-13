@@ -23,10 +23,6 @@
             </div>
           </div>
         </div>
-      {:else if $gameStore.waitingForPieceSelection}
-        <div class="selection-needed">
-          <h3>Select a piece for the computer to use:</h3>
-        </div>
       {/if}
       
       <div class="available-pieces">
