@@ -1,9 +1,3 @@
 {
-    "framework": "svelte",
-    "builds": [
-      {
-        "src": "package.json",
-        "use": "@vercel/node@18"
-      }
-    ]
-  }
+    "framework": "sveltekit"
+}
