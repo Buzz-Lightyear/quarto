@@ -1,11 +1,9 @@
 {
-    "version": 2,
+    "framework": "svelte",
     "builds": [
       {
         "src": "package.json",
-        "use": "@vercel/node"
+        "use": "@vercel/node@18"
       }
-    ],
-    "framework": "svelte",
-    "nodeVersion": 18
+    ]
   }
