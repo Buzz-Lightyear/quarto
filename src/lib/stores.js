@@ -23,25 +23,40 @@ function createGameStore() {
       .filter(index => index !== -1);
     
     if (availableSpots.length === 0) return state;
-    
-    // Computer makes a random move
-    const position = availableSpots[Math.floor(Math.random() * availableSpots.length)];
+
+    // Can the computer win?
     const newBoard = [...state.board];
-    newBoard[position] = state.selectedPiece;
-    
     const remainingPieces = state.pieces.filter(p => p.id !== state.selectedPiece.id);
     
-    // Check if computer won
-    if (checkWin(newBoard)) {
-      return {
-        ...state,
-        board: newBoard,
-        pieces: remainingPieces,
-        selectedPiece: null,
-        winner: 'Computer',
-        gameOver: true
-      };
+    const winningSpot = availableSpots.find(spot => {
+        const testBoard = [...state.board];
+        testBoard[spot] = state.selectedPiece;
+        return checkWin(testBoard);
+    });
+
+    if (winningSpot !== undefined) {
+        newBoard[winningSpot] = state.selectedPiece;
+        return {
+            ...state,
+            board: newBoard,
+            pieces: remainingPieces,
+            selectedPiece: null,
+            winner: 'Computer',
+            gameOver: true
+        }
     }
+
+    // Place piece in first available spot
+    newBoard[availableSpots[0]] = state.selectedPiece;
+
+    // Pick a piece that prevents a win
+    const safeRemainingPieces = remainingPieces.filter(piece => {
+        return !availableSpots.some(spot => {
+            const testBoard = [...newBoard];
+            testBoard[spot] = piece;
+            return checkWin(testBoard);
+        });
+    });
 
     // If there are no more pieces, game is a draw
     if (remainingPieces.length === 0) {
@@ -54,8 +69,7 @@ function createGameStore() {
       };
     }
 
-    // Computer chooses a piece for the player
-    const nextPiece = remainingPieces[Math.floor(Math.random() * remainingPieces.length)];
+    const nextPiece = safeRemainingPieces.length > 0 ? safeRemainingPieces[0] : remainingPieces[0]
     const newPieces = remainingPieces.filter(p => p.id !== nextPiece.id);
     
     return {
